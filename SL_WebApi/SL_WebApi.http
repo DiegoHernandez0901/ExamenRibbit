@@ -1,0 +1,5 @@
+@SL_WebApi_HostAddress = http://localhost:5081
+
+GET {{SL_WebApi_HostAddress}}/producto/
+Accept: application/json
+###

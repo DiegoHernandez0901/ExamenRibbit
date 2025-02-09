@@ -1,0 +1,169 @@
+﻿@model ML.Producto
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+<div class="container mt-4">
+    @if (Model.Id != 0)
+    {
+        @using (Html.BeginForm("Edit", "Productos", FormMethod.Post, new { enctype = "multipart/form-data", id = "formCrearProducto" }))
+        {
+            <h2 class="mb-4">Editar Producto</h2>
+            <div class="row">
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                <div class="col-md-6">
+                    @Html.HiddenFor(model => model.Id)
+                    <div class="mb-3">
+                        @Html.LabelFor(model => model.Nombre)
+                        @Html.TextBoxFor(model => model.Nombre, new { @class = "form-control", @required = "required", @id = "txtNombre" })
+                        <label id="lblErrorNombre" class="text-danger" style="display: none;">Nombre debe tener entre 3 y 100 caracteres</label>
+                    </div>
+
+                    <div class="mb-3">
+                        @Html.LabelFor(model => model.Descripcion)
+                        @Html.TextBoxFor(model => model.Descripcion, new { @class = "form-control" })
+                    </div>
+
+                    <div class="mb-3">
+                        @Html.LabelFor(model => model.Precio)
+                        @Html.TextBoxFor(model => model.Precio, new { @class = "form-control", @required = "required", @id = "txtPrecio" })
+                        <label id="lblErrorPrecio" class="text-danger" style="display: none;">El precio debe ser mayor a 0</label>
+                        <label id="lblErrorPrecioInput" class="text-danger" style="display: none;">Introduce un valor numérico</label>
+                    </div>
+
+                    <div class="mb-3">
+                        @Html.LabelFor(model => model.CantidadStock)
+                        @Html.TextBoxFor(model => model.CantidadStock, new { @class = "form-control", @required = "required", @id = "txtCantidadStock" })
+                        <label id="lblErrorCantidadStock" class="text-danger" style="display: none;">La cantidad en stock no puede ser negativa</label>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <button type="button" id="btnGuardar" class="btn btn-success" onclick="Actualizar()">Guardar</button>
+                    @Html.ActionLink("Regresar", "Index", "Productos", new { @class = "btn btn-danger" })
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        @using (Html.BeginForm("Create", "Productos", FormMethod.Post, new { enctype = "multipart/form-data" }))
+        {
+            <h2 class="mb-4">Crear Producto</h2>
+            <div class="row">
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        @Html.LabelFor(model => model.Nombre)
+                        @Html.TextBoxFor(model => model.Nombre, new { @class = "form-control", @required = "required", @id = "txtNombre" })
+                        <label id="lblErrorNombre" class="text-danger" style="display: none;">Nombre debe tener entre 3 y 100 caracteres</label>
+                    </div>
+
+                    <div class="mb-3">
+                        @Html.LabelFor(model => model.Descripcion)
+                        @Html.TextBoxFor(model => model.Descripcion, new { @class = "form-control" })
+                    </div>
+
+                    <div class="mb-3">
+                        @Html.LabelFor(model => model.Precio)
+                        @Html.TextBoxFor(model => model.Precio, new { @class = "form-control", @required = "required", @id = "txtPrecio" })
+                        <label id="lblErrorPrecio" class="text-danger" style="display: none;">El precio debe ser mayor a 0</label>
+                        <label id="lblErrorPrecioInput" class="text-danger" style="display: none;">Introduce un valor numérico</label>
+                    </div>
+
+                    <div class="mb-3">
+                        @Html.LabelFor(model => model.CantidadStock)
+                        @Html.TextBoxFor(model => model.CantidadStock, new { @class = "form-control", @required = "required", @id = "txtCantidadStock" })
+                        <label id="lblErrorCantidadStock" class="text-danger" style="display: none;">La cantidad en stock no puede ser negativa</label>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <button type="submit" class="btn btn-success">Guardar</button>
+                    @Html.ActionLink("Regresar", "Index", "Productos", new { @class = "btn btn-danger" })
+                </div>
+            </div>
+        }
+    }
+</div>
+
+<script src="~/Scripts/jquery-3.4.1.js"></script>
+<script>
+        function Actualizar() {
+        var formData = new FormData($('#formCrearProducto')[0]);
+
+        $.ajax({
+            url: '@Url.Action("Edit", "Productos")',
+            type: 'POST',
+            data: formData,
+            contentType: false,
+            processData: false,
+            success: function (response) {                
+                if (response.success) {                    
+                    alert('Producto editado exitosamente.');
+                    window.location.href = '@Url.Action("Index", "Productos")';
+                } else {                    
+                    alert('Error: ' + response.message);
+                }
+            },
+            error: function (xhr, status, error) {                
+                alert('Ocurrió un error: ' + error);
+            }
+        });
+    }
+
+        document.getElementById("txtNombre").addEventListener("blur", function () {
+		var valor = document.getElementById("txtNombre").value;
+		if (valor.length < 3 || valor.length > 100) {
+			document.getElementById("lblErrorNombre").style.display = "block";
+			document.getElementById("txtNombre").style.border = "1px solid red";
+		} else {
+			document.getElementById("lblErrorNombre").style.display = "none";
+			document.getElementById("txtNombre").style.border = "1px solid green";
+		}
+	});
+
+		document.getElementById("txtPrecio").addEventListener("blur", function () {
+		var valor = parseFloat(document.getElementById("txtPrecio").value);
+		if (isNaN(valor) || valor <= 0) {
+			document.getElementById("lblErrorPrecio").style.display = "block";
+			document.getElementById("txtPrecio").style.border = "1px solid red";
+		} else {
+			document.getElementById("lblErrorPrecio").style.display = "none";
+			document.getElementById("txtPrecio").style.border = "1px solid green";
+		}
+	});
+		document.getElementById("txtPrecio").addEventListener("keypress", function (e) {
+		var char = e.key;
+		if (!/^[0-9.]$/.test(char) && char !== "Backspace") {
+			e.preventDefault();
+			document.getElementById("lblErrorPrecioInput").style.display = "block";
+			document.getElementById("txtPrecio").style.border = "1px solid red";
+		}
+		else{
+			document.getElementById("lblErrorPrecioInput").style.display = "none";			
+		}
+	});
+		document.getElementById("txtCantidadStock").addEventListener("blur", function () {
+		var valor = parseInt(document.getElementById("txtCantidadStock").value, 10);		
+		if (isNaN(valor) || valor < 0) {
+			document.getElementById("lblErrorCantidadStock").style.display = "block";
+			document.getElementById("txtCantidadStock").style.border = "1px solid red";
+		} else {
+			document.getElementById("lblErrorCantidadStock").style.display = "none";
+			document.getElementById("txtCantidadStock").style.border = "1px solid green";
+		}
+	});
+
+			document.getElementById("txtCantidadStock").addEventListener("keypress", function (e) {		
+		var char = e.key;
+		if (!/^[0-9]$/.test(char) && char !== "Backspace") { 
+			e.preventDefault();
+			document.getElementById("lblErrorCantidadStock").style.display = "block";
+			document.getElementById("txtCantidadStock").style.border = "1px solid red";
+		}
+	});
+</script>
